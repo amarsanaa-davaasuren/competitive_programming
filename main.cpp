@@ -19,7 +19,7 @@
 #include <time.h>
 #include <unordered_map>
 #include <unordered_set>
-#include <bits/stdc++.h>
+// #include <bits/stdc++.h>
 #include <complex>
 
 #define maxs(x,y) x = max(x,y)
@@ -47,7 +47,7 @@ typedef std::vector<int> vi;
 typedef std::vector<pii> vii;
 
 const double PI = 3.14159265358979323846264338327950L;
-int mod = 998244353;
+int mod = 1e9+7;
 const ll INFLL = 1LL<<62;
 const int INF = 1<<30;
 
@@ -113,115 +113,31 @@ struct combination {
 };
 
 
-int n,m;
-using bint = int;
-struct BIT{
-    static const int SIZE = 200005;
-	bint bit[SIZE];
-    
-	void init(int size){
-        memset(bit,bint(0),sizeof(size));
-    }
-    
-	void add(int k,bint x) {
-		k++;
-		while(k<SIZE){
-			bit[k]+=x;
-            bit[k] %= m;
-			k+=k&-k;
-		}
-	}
-    
-	bint get(int k){ // inclusive
-		k++;
-		bint ret=0;
-		while(k>0){
-			ret+=bit[k];
-            ret %= m;
-			k-=k&-k;
-		}
-		return ret;
-	}
-    
-	bint get(int s,int t){ // inclusive 
-		return get(t)-get(s-1);
-	}
-};
 
-BIT bit;
+
+/*
+
+g++ -o main .\main.cpp
+cmd /c '.\main.exe < .\in.txt > .\out.txt'
+
+*/
 
 
 
 void solve(){
 
-    cin >> n >> m;
-
-    bit.init(n+2);
-    bit.add(n,1);
-    bit.add(n+1,-1);
-
-    for(int cur = n; cur >= 2; cur--){
-        ll w = bit.get(cur);
-        bit.add(1,w);
-        bit.add(cur,-w);
-        
-        int to = 1;
-        int sofar = 0;
-        while(true){
-            int up = (cur/to);
-            int low = (cur/(to+1));
-            int cnt = (up-low);
-            sofar += cnt;
-            bit.add(to,(w*cnt)%m);
-            bit.add(to+1,(-w*cnt)%m);
-            // cout << cur << " " << cnt << " " <<  to << endl;
-            to = (cur/(cur-sofar));
-            
-            // cout << to << endl;
-            if (to==cur) break;
-            // break; 
-            
-            // cout << cur << " " << to << endl;
-
-        }
-        // rep(i,n){
-        //     cout << bit.get(i+1) << " ";
-        // }
-        // cout << endl;
-    }
     
-    ll ans = bit.get(1);
-    ans = (ans+m)%m;
-    cout << ans << endl;
-    
-    
-//     int D = 10000;
-//     for(int i = D; i < D+1; i++){
-//         map<int,int> a;
-//         rep(d,(i+1)){
-//             a[(i+2)/(d+2)]++;
-//         }
-//         cout << a.size() << endl;
-//         // for(auto e:a) cout << e.first <<":"<< e.second << " ";
-//         // cout << endl;
-//     }
-    
-    
-//     int p = D+2-(568+190);
-//     cout << (D+2)/p;
-
 }
 
 
 int main() {
-
     int T = 1;
     // cin >> T;
     while (T--) {
         solve();
-        // cout << endl;
     }
 }
+
 
 
 
