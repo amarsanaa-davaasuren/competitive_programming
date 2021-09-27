@@ -56,12 +56,6 @@ const int INF = 1<<30;
 
 
 
-
-
-
-
-
-
 void computeLPSArray(char* pat, int M, vector<int>& lps);
   
 // Prints occurrences of txt[] in pat[]
