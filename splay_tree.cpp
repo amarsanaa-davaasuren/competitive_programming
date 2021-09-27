@@ -560,13 +560,14 @@ int main(){
     int prefix = get_sum(tree.query_prefix_count(1));    
     int suffix = get_sum(tree.query_suffix_count(1));    
     
-    // cout << prefix << " " << suffix << endl;
-    // cout << tree.node_pool.size() << " ";
-    // cout << tree.pointers_to_delete.size() << endl;
-    
+    cout << prefix << " " << suffix << endl;
+
+    // Returns {node pointer, index (number of existing elements that are strictly less)}
     // auto ret = tree.lower_bound(101);
-    auto ret = tree.query_range(4,10);
-    cout << ret->key << endl;
+    
+    auto ret = tree.query_range(4,7);
+    cout << ret->key << " " << ret->sum <<  endl;
+
     
     print_tree(ret);
     // cout << ret.first->key << " ";

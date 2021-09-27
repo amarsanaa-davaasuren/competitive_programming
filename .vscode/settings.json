@@ -61,7 +61,9 @@
         "xtree": "cpp",
         "xutility": "cpp",
         "array": "cpp",
-        "complex": "cpp"
+        "complex": "cpp",
+        "numeric": "cpp",
+        "sstream": "cpp"
     },
     "C_Cpp.dimInactiveRegions": false
 }

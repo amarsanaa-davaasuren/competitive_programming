@@ -21,6 +21,7 @@
 #include <unordered_set>
 // #include <bits/stdc++.h>
 #include <complex>
+#include <numeric>
 
 #define maxs(x,y) x = max(x,y)
 #define mins(x,y) x = min(x,y)
