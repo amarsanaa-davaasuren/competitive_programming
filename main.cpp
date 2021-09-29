@@ -321,17 +321,6 @@ F composition(F f, F g){// 区間関数の結合
 F id() { // id を返す関数 F id()
     return 0; 
 }
- 
-
-
-/*
-
-g++ -o main .\main.cpp
-cmd /c '.\main.exe < .\in.txt'
-cmd /c '.\main.exe < .\in.txt' > .\out.txt'
-
-*/
-
 
  
 void solve() {
@@ -339,14 +328,14 @@ void solve() {
 
     int n,m;
     cin >> n >> m;
-    vector<pair<ll,ll>> intervals[20020];
+    map<int,vector<pair<int,int>>> intervals;
     rep(i,m){
         ll l,r,a;
         cin >> l >> r >> a;
         intervals[r].pb({l,a});
     }
 
-    lazy_segtree<S, op, e, F, mapping, composition, id> sg(20020);
+    lazy_segtree<S, op, e, F, mapping, composition, id> sg(200200);
 
     rep(i,n+1){
         if (i == 0) continue;
