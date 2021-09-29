@@ -329,6 +329,7 @@ F id() { // id を返す関数 F id()
 g++ -o main .\main.cpp
 cmd /c '.\main.exe < .\in.txt'
 cmd /c '.\main.exe < .\in.txt' > .\out.txt'
+
 */
 
 
@@ -338,14 +339,14 @@ void solve() {
 
     int n,m;
     cin >> n >> m;
-    vector<pair<ll,ll>> intervals[200200];
+    vector<pair<ll,ll>> intervals[20020];
     rep(i,m){
         ll l,r,a;
         cin >> l >> r >> a;
         intervals[r].pb({l,a});
     }
 
-    lazy_segtree<S, op, e, F, mapping, composition, id> sg(200200);
+    lazy_segtree<S, op, e, F, mapping, composition, id> sg(20020);
 
     rep(i,n+1){
         if (i == 0) continue;
