@@ -553,23 +553,25 @@ int main(){
     
     splay_tree tree;
     vector<int> init(10001);
-    rep(i,10001) init[i] = i;
+    rep(i,100) tree.insert(i);
+    rep(i,100) tree.insert(i);
+    rep(i,100) tree.insert(i+1);
     
-    tree.init(init);
+    // tree.init(init);
     
     int prefix = get_sum(tree.query_prefix_count(1));    
     int suffix = get_sum(tree.query_suffix_count(1));    
     
-    cout << prefix << " " << suffix << endl;
+    // cout << prefix << " " << suffix << endl;
 
     // Returns {node pointer, index (number of existing elements that are strictly less)}
-    // auto ret = tree.lower_bound(101);
-    
-    auto ret = tree.query_range(4,7);
-    cout << ret->key << " " << ret->sum <<  endl;
+    auto ret = tree.lower_bound(2).second-tree.lower_bound(1).second;
+    cout << ret;
+    // auto ret = tree.query_range(4,7);
+    // cout << ret->key << " " << ret->sum <<  endl;
 
     
-    print_tree(ret);
+    // print_tree(ret);
     // cout << ret.first->key << " ";
     // cout << ret.second << " ";
       

@@ -65,5 +65,6 @@
         "numeric": "cpp",
         "sstream": "cpp"
     },
-    "C_Cpp.dimInactiveRegions": false
+    "C_Cpp.dimInactiveRegions": false,
+    "debug.onTaskErrors": "abort"
 }

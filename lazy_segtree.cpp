@@ -43,7 +43,9 @@ typedef std::vector<int> vi;
 typedef std::vector<pii> vii;
 
 #define PI 3.14159265358979323846264338327950L
-const int mod = 998244353;
+int mod = 1e9+7;
+const ll INFLL = 1LL<<62;
+const int INF = 1<<30;
 
 struct mint {
     ll x; // typedef long long ll;
@@ -265,23 +267,23 @@ struct lazy_segtree {
 
 
 
-struct S { ll inv, c0, c1; }; // セグ木要素
+struct S { ll a,b;}; // セグ木要素
  
-using F = int; // 区間関数
+using F = ll; // 区間関数
  
 S op(S sl, S sr) { // セグ木・結合
-  return {sl.inv + sr.inv + sl.c1 * sr.c0, sl.c0 + sr.c0, sl.c1 + sr.c1};
+  return {sl.a+sr.a,max(sl.b,sr.b)};
 }
  
-S e() { return {0, 0, 0}; } // unitary element
+S e() { return {0,0}; } // unitary element
  
 S mapping(F f, S s){ // 区間関数
   if (f == 0) return s;
-  return {s.c0 * s.c1 - s.inv, s.c1, s.c0};
+  return {0,s.b+s.a+f};
 }
  
 F composition(F f, F g){// 区間関数の結合
-     return f^g; 
+     return f+g; 
 }
  
 F id() { // id を返す関数 F id()
@@ -289,21 +291,43 @@ F id() { // id を返す関数 F id()
 }
  
  
-int main() {
+void solve() {
 
-  int n, q; cin >> n >> q;
-  vector<S> v(n);
 
-  rep(i, n) {
-    int a; cin >> a;
-    v[i] = {0, a^1, a};
-  }
+    int n,m;
+    cin >> n >> m;
+    vector<pair<ll,ll>> intervals[20020];
+    rep(i,m){
+        ll l,r,a;
+        cin >> l >> r >> a;
+        intervals[r].pb({l,a});
+    }
 
-  lazy_segtree<S, op, e, F, mapping, composition, id> sg(v);
- 
-  rep(_, q) {
-    int t, l, r; cin >> t >> l >> r;--l;
-    if (t == 1) sg.apply(l, r, 1);
-    else cout << sg.prod(l, r).inv << endl;
-  }
+    lazy_segtree<S, op, e, F, mapping, composition, id> sg(20020);
+
+    rep(i,n+1){
+        if (i == 0) continue;
+        ll mx = sg.prod(0,i).b;
+        sg.apply(i,i+1,mx);
+        for(auto el : intervals[i]){
+            ll l = el.first;
+            ll a = el.second;
+            sg.apply(l,i+1,a);
+        }
+    }
+    ll ans = sg.all_prod().b;
+    cout << ans;
+    
 }
+
+
+int main() {
+    int T = 1;
+    // cin >> T;
+    while (T--) {
+        solve();
+    }
+}
+
+
+
