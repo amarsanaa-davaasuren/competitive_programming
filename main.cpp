@@ -112,74 +112,15 @@ struct combination {
   }
 } comb(1000);
 
-using bint = mint;
-struct BIT{
-    static const int SIZE = 10005;
-	bint bit[SIZE];
-    
-	void init(){
-        memset(bit,0,sizeof(bit));
-    }
-    
-	void add(int k,bint x) {
-		k++;
-		while(k<SIZE){
-			bit[k]+=x;
-			k+=k&-k;
-		}
-	}
-    
-	bint get(int k){ // inclusive
-		k++;
-		bint ret=0;
-		while(k>0){
-			ret+=bit[k];
-			k-=k&-k;
-		}
-		return ret;
-	}
-    
-	bint get(int s,int t){ // inclusive 
-		return get(t)-get(s-1);
-	}
-};
-
 void solve() {
-    // i個目まで決めて、残り n-i個の中にj個がi個目より大きい
-    int n;
-    string s;
-    cin >> n >> s;
-    int dp[4000][4000] = {};
-    rep(i,4000) rep(j,4000) dp[i][j] = 1;
-    cout << dp[0][0] << endl;
-    BIT bit;
-    rep(i,n+1){
-        bit.add(i,1);
-    }
-    rep(ii,n-1){
-        char c = s[ii];
-        int i = ii+1;
-        int left = (n-i);
-        BIT next;
-        rep(larger,left+1){
-            if (c == '<'){
-                next.add(larger,bit.get(larger+1,left));
-            }
-            else{
-                next.add(larger,bit.get(0,larger));    
-            }
-        }
-        swap(next,bit);
-    }
 
-    cout << bit.get(0,0);
-    
+
+
 }
 
 
 int main() {
     int T = 1;
-    // comb = combination(200200);
     // cin >> T;
 
     while (T--) {

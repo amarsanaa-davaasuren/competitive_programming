@@ -181,7 +181,6 @@ int main() {
     int T = 1;
     cin >> T;
 
-
     rep(i,T){
         printf("Case #%d: ",i+1);
         solve();
