@@ -47,7 +47,7 @@ typedef std::vector<int> vi;
 typedef std::vector<pii> vii;
 
 const double PI = 3.14159265358979323846264338327950L;
-int mod = 1e9+7;
+int mod = 998244353;
 const ll INFLL = 1LL<<62;
 const int INF = 1<<30;
 
@@ -112,16 +112,17 @@ struct combination {
   }
 } comb(1000);
 
+
+
 void solve() {
-
-
-
+    
 }
+
 
 
 int main() {
     int T = 1;
-    // cin >> T;
+    cin >> T;
 
     while (T--) {
         solve();
