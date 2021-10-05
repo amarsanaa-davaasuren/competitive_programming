@@ -229,21 +229,10 @@ void solve(){
     cin >> n;
     TREE tree(n);
     tree.read_graph();
-    if (n>10){
-        tree.get_depths(10);            
-    }
-    else tree.get_depths(0);
-    int q;
-    cin >> q;
-    rep(i,q){
-        int a,b;
-        cin >> a >> b;
-        a--;b--;
-        int c = tree.lca(a,b);
-        int la = -tree.depths[c]+tree.depths[a];
-        int lb = -tree.depths[c]+tree.depths[b];
-        cout << la + lb + 1 << endl;
-    }
+    tree.get_depths(0);
+    int lca = tree.lca(0,1);
+    tree.get_path_to_floor(1);
+    int D = tree.get_diameter();
 }
 
 
