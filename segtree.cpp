@@ -90,6 +90,7 @@ int ceil_pow2(int n) {
 }
 }
 
+//segtree<SGT, op, e> seg(100100);
 template <class S, S (*op)(S, S), S (*e)()> struct segtree {
   public:
     segtree() : segtree(0) {}
@@ -130,7 +131,7 @@ template <class S, S (*op)(S, S), S (*e)()> struct segtree {
         }
         return op(sml, smr);
     }
-
+    
     S all_prod() const { return d[1]; }
 
     template <bool (*f)(S)> int max_right(int l) const {
