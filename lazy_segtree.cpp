@@ -334,25 +334,25 @@ void solve(){
 
     int n;
     cin >> n;
-    sg.apply(1,2,1);
-    sg.apply(2,3,-1);
+
+
+
     rep(i,n){
-        int x;
-        cin >> x;
-        mint v = x;
-        int now = i+1;
-        mint val = sg.prod(0,now+1).value;
-        mint UNIT = mint(mint(2)*val)/((v+1)*v);
-        sg.apply(now+1,now+2, mint(UNIT*v));
-        sg.apply(now+2,now+v.x+2,mint(-1)*UNIT);
-
+        int x,v;
+        cin >> x >> v;
+        
+        
+        
+        
+        sg.apply(x,x+1, v);
+        sg.apply(x+1,x+1+v,-1);
+        rep(j,20){
+            mint a = sg.prod(0,j+1).value;
+            cout << a << " ";
+        }
+        cout << endl;
     }
 
-    mint ans = 0;
-    for(int i = n+1; i <= 400100 ; i++){
-        ans += mint(i)*sg.prod(0,i+1).value;
-    }
-    cout << ans << endl;
 
 
 }
