@@ -17,35 +17,58 @@
 #include <set>
 #include <stack>
 #include <time.h>
+#include <unordered_map>
+#include <unordered_set>
+// #include <bits/stdc++.h>
+#include <complex>
 
-//#include <bits/stdc++.h>
 #define maxs(x,y) x = max(x,y)
 #define mins(x,y) x = min(x,y)
-#define rep(i,n) for(int (i)=0;(i)<(n);(i)++)
+#define rep(i,n) for(int i=0;(i)<(n);(i)++)
 #define repr(i, n) for (int i = (n) - 1; i >= 0; i--)
 #define FOR(i,i0,n) for(int (i)=(i0);(i)<(n);(i)++)
 #define FORR(i,i0,n) for(int (i)=(n)-1; (i)>=(i0);(i)--)
 #define SORT(x) sort(x.begin(),x.end())
-#define SORTR(x) sort(x.begin(),x.end(),greater<vector<int>>())
-
+#define SORTR(x) sort(x.begin(),x.end(),greater<int>())
 #define fi first
 #define se second
 #define pb push_back
 #define eb emplace_back
-#define mp make_pair
 #define mt make_tuple
 
 using namespace std;
 using ll = long long;
+using LL = long long;
+using comp = complex<double>;
+
 typedef std::pair<int, int> pii;
 typedef std::pair<int, double> pid;
 typedef std::vector<int> vi;
 typedef std::vector<pii> vii;
 
-#define PI 3.14159265358979323846264338327950L
-int mod = 1e9+7;
+const double PI = 3.14159265358979323846264338327950L;
+
+int mod = 998244353;
 const ll INFLL = 1LL<<62;
 const int INF = 1<<30;
+
+comp inC(){
+    double x,y;
+    cin >> x >> y;
+    return {x,y};
+}
+
+struct Data {
+    ll cost,val;
+    Data(ll cost=0, ll val=0) : cost(cost), val(val){}
+    bool operator<(const Data& a) const {
+        return cost > a.cost;
+    }
+};
+
+void tle(){
+    rep(i,2002002002002) continue;
+}
 
 struct mint {
     ll x; // typedef long long ll;
@@ -78,8 +101,20 @@ struct mint {
 };
 istream& operator>>(istream& is, mint& a) { return is >> a.x;}
 ostream& operator<<(ostream& os, const mint& a) { return os << a.x;}
-
-
+struct combination {
+  vector<mint> fact, ifact;
+  combination(int n):fact(n+1),ifact(n+1) {
+    assert(n < mod);
+    fact[0] = 1;
+    for (int i = 1; i <= n; ++i) fact[i] = fact[i-1]*i;
+    ifact[n] = fact[n].inv();
+    for (int i = n; i >= 1; --i) ifact[i-1] = ifact[i]*i;
+  }
+  mint operator()(int n, int k) {
+    if (k < 0 || k > n) return 0;
+    return fact[n]*ifact[k]*ifact[n-k];
+  }
+} comb(202);
 
 
 namespace internal {
@@ -267,19 +302,19 @@ struct lazy_segtree {
 
 
 
-struct S { ll a,b;}; // セグ木要素
+struct S { mint value,size;}; // セグ木要素
  
-using F = ll; // 区間関数
+using F = mint; // 区間関数
  
 S op(S sl, S sr) { // セグ木・結合
-  return {sl.a+sr.a,max(sl.b,sr.b)};
+  return {sl.value+sr.value,sl.size+sr.size};
 }
- 
-S e() { return {0,0}; } // unitary element
+
+S e() { return {0,1}; } // unitary element
  
 S mapping(F f, S s){ // 区間関数
-  if (f == 0) return s;
-  return {0,s.b+s.a+f};
+  if (f.x == 0) return s;
+  return {s.value+s.size*f,s.size};
 }
  
 F composition(F f, F g){// 区間関数の結合
@@ -290,35 +325,39 @@ F id() { // id を返す関数 F id()
     return 0; 
 }
  
- 
-void solve() {
 
 
-    int n,m;
-    cin >> n >> m;
-    vector<pair<ll,ll>> intervals[20020];
-    rep(i,m){
-        ll l,r,a;
-        cin >> l >> r >> a;
-        intervals[r].pb({l,a});
-    }
-
-    lazy_segtree<S, op, e, F, mapping, composition, id> sg(20020);
-
-    rep(i,n+1){
-        if (i == 0) continue;
-        ll mx = sg.prod(0,i).b;
-        sg.apply(i,i+1,mx);
-        for(auto el : intervals[i]){
-            ll l = el.first;
-            ll a = el.second;
-            sg.apply(l,i+1,a);
-        }
-    }
-    ll ans = sg.all_prod().b;
-    cout << ans;
+void solve(){
     
+
+    lazy_segtree<S, op, e, F, mapping, composition, id> sg(400200);
+
+    int n;
+    cin >> n;
+    sg.apply(1,2,1);
+    sg.apply(2,3,-1);
+    rep(i,n){
+        int x;
+        cin >> x;
+        mint v = x;
+        int now = i+1;
+        mint val = sg.prod(0,now+1).value;
+        mint UNIT = mint(mint(2)*val)/((v+1)*v);
+        sg.apply(now+1,now+2, mint(UNIT*v));
+        sg.apply(now+2,now+v.x+2,mint(-1)*UNIT);
+
+    }
+
+    mint ans = 0;
+    for(int i = n+1; i <= 400100 ; i++){
+        ans += mint(i)*sg.prod(0,i+1).value;
+    }
+    cout << ans << endl;
+
+
 }
+
+
 
 
 int main() {
