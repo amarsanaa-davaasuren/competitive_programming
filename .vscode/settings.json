@@ -66,5 +66,6 @@
         "sstream": "cpp"
     },
     "C_Cpp.dimInactiveRegions": false,
-    "debug.onTaskErrors": "abort"
+    "debug.onTaskErrors": "abort",
+    "C_Cpp.errorSquiggles": "Disabled"
 }
