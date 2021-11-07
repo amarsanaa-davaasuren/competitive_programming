@@ -39,7 +39,7 @@
 using namespace std;
 using ll = long long;
 using LL = long long;
-using comp = complex<double>;
+using comp = complex<long double>;
 
 typedef std::pair<int, int> pii;
 typedef std::pair<int, double> pid;
@@ -58,13 +58,7 @@ comp inC(){
     return {x,y};
 }
 
-struct Data {
-    ll cost,val;
-    Data(ll cost=0, ll val=0) : cost(cost), val(val){}
-    bool operator<(const Data& a) const {
-        return cost > a.cost;
-    }
-};
+
 
 void tle(){
     rep(i,2002002002002) continue;
@@ -117,245 +111,58 @@ struct combination {
 } comb(202);
 
 
-namespace internal {
-int ceil_pow2(int n) {
-    int x = 0;
-    while ((1U << x) < (unsigned int)(n)) x++;
-    return x;
-}
-}
-
-
-template <class S,
-          S (*op)(S, S),
-          S (*e)(),
-          class F,
-          S (*mapping)(F, S),
-          F (*composition)(F, F),
-          F (*id)()>
-struct lazy_segtree {
-  public:
-    lazy_segtree() : lazy_segtree(0) {}
-    explicit lazy_segtree(int n) : lazy_segtree(std::vector<S>(n, e())) {}
-    explicit lazy_segtree(const std::vector<S>& v) : _n(int(v.size())) {
-        log = internal::ceil_pow2(_n);
-        size = 1 << log;
-        d = std::vector<S>(2 * size, e());
-        lz = std::vector<F>(size, id());
-        for (int i = 0; i < _n; i++) d[size + i] = v[i];
-        for (int i = size - 1; i >= 1; i--) {
-            update(i);
-        }
-    }
-
-    void set(int p, S x) {
-        assert(0 <= p && p < _n);
-        p += size;
-        for (int i = log; i >= 1; i--) push(p >> i);
-        d[p] = x;
-        for (int i = 1; i <= log; i++) update(p >> i);
-    }
-
-    S get(int p) const {
-        assert(0 <= p && p < _n);
-        p += size;
-        for (int i = log; i >= 1; i--) push(p >> i);
-        return d[p];
-    }
-
-    S prod(int l, int r) const {
-        assert(0 <= l && l <= r && r <= _n);
-        if (l == r) return e();
-
-        l += size;
-        r += size;
-
-        for (int i = log; i >= 1; i--) {
-            if (((l >> i) << i) != l) push(l >> i);
-            if (((r >> i) << i) != r) push((r - 1) >> i);
-        }
-
-        S sml = e(), smr = e();
-        while (l < r) {
-            if (l & 1) sml = op(sml, d[l++]);
-            if (r & 1) smr = op(d[--r], smr);
-            l >>= 1;
-            r >>= 1;
-        }
-
-        return op(sml, smr);
-    }
-
-    S all_prod() const { return d[1]; }
-
-    void apply(int p, F f) {
-        assert(0 <= p && p < _n);
-        p += size;
-        for (int i = log; i >= 1; i--) push(p >> i);
-        d[p] = mapping(f, d[p]);
-        for (int i = 1; i <= log; i++) update(p >> i);
-    }
-    void apply(int l, int r, F f) {
-        assert(0 <= l && l <= r && r <= _n);
-        if (l == r) return;
-
-        l += size;
-        r += size;
-
-        for (int i = log; i >= 1; i--) {
-            if (((l >> i) << i) != l) push(l >> i);
-            if (((r >> i) << i) != r) push((r - 1) >> i);
-        }
-
-        {
-            int l2 = l, r2 = r;
-            while (l < r) {
-                if (l & 1) all_apply(l++, f);
-                if (r & 1) all_apply(--r, f);
-                l >>= 1;
-                r >>= 1;
-            }
-            l = l2;
-            r = r2;
-        }
-
-        for (int i = 1; i <= log; i++) {
-            if (((l >> i) << i) != l) update(l >> i);
-            if (((r >> i) << i) != r) update((r - 1) >> i);
-        }
-    }
-
-    template <bool (*g)(S)> int max_right(int l) const {
-        return max_right(l, [](S x) { return g(x); });
-    }
-    template <class G> int max_right(int l, G g) const {
-        assert(0 <= l && l <= _n);
-        assert(g(e()));
-        if (l == _n) return _n;
-        l += size;
-        for (int i = log; i >= 1; i--) push(l >> i);
-        S sm = e();
-        do {
-            while (l % 2 == 0) l >>= 1;
-            if (!g(op(sm, d[l]))) {
-                while (l < size) {
-                    push(l);
-                    l = (2 * l);
-                    if (g(op(sm, d[l]))) {
-                        sm = op(sm, d[l]);
-                        l++;
-                    }
-                }
-                return l - size;
-            }
-            sm = op(sm, d[l]);
-            l++;
-        } while ((l & -l) != l);
-        return _n;
-    }
-
-    template <bool (*g)(S)> int min_left(int r) const {
-        return min_left(r, [](S x) { return g(x); });
-    }
-    template <class G> int min_left(int r, G g) const {
-        assert(0 <= r && r <= _n);
-        assert(g(e()));
-        if (r == 0) return 0;
-        r += size;
-        for (int i = log; i >= 1; i--) push((r - 1) >> i);
-        S sm = e();
-        do {
-            r--;
-            while (r > 1 && (r % 2)) r >>= 1;
-            if (!g(op(d[r], sm))) {
-                while (r < size) {
-                    push(r);
-                    r = (2 * r + 1);
-                    if (g(op(d[r], sm))) {
-                        sm = op(d[r], sm);
-                        r--;
-                    }
-                }
-                return r + 1 - size;
-            }
-            sm = op(d[r], sm);
-        } while ((r & -r) != r);
-        return 0;
-    }
-
-  private:
-    int _n, size, log;
-    mutable std::vector<S> d;
-    mutable std::vector<F> lz;
-
-    void update(int k) { d[k] = op(d[2 * k], d[2 * k + 1]); }
-    void all_apply(int k, F f) const {
-        d[k] = mapping(f, d[k]);
-        if (k < size) lz[k] = composition(f, lz[k]);
-    }
-    void push(int k) const {
-        all_apply(2 * k, lz[k]);
-        all_apply(2 * k + 1, lz[k]);
-        lz[k] = id();
-    }
-};
-
-
-
-struct S { mint value,size;}; // セグ木要素
- 
-using F = mint; // 区間関数
- 
-S op(S sl, S sr) { // セグ木・結合
-  return {sl.value+sr.value,sl.size+sr.size};
-}
-
-S e() { return {0,1}; } // unitary element
- 
-S mapping(F f, S s){ // 区間関数
-  if (f.x == 0) return s;
-  return {s.value+s.size*f,s.size};
-}
- 
-F composition(F f, F g){// 区間関数の結合
-     return f+g; 
-}
- 
-F id() { // id を返す関数 F id()
-    return 0; 
-}
- 
-
+vector<int> g[200200];
+tuple<int,int,int> V[200200];
 
 void solve(){
+    cin.tie(nullptr), ios::sync_with_stdio(false);
+    int n,m,q;
+    cin >> n >> m >> q;
     
+    rep(i,m){
+        int u,v;
+        cin >> u >> v;
+        u--;v--;
+        g[u].pb(v);
+        g[v].pb(u);
+    }
+    rep(i,n) V[i] = {i+1,0,0}; // value, last time updated, need to propagated
 
-    lazy_segtree<S, op, e, F, mapping, composition, id> sg(400200);
-
-    int n;
-    cin >> n;
-    sg.apply(1,2,1);
-    sg.apply(2,3,-1);
-    rep(i,n){
+    rep(i,q){
         int x;
         cin >> x;
-        mint v = x;
-        int now = i+1;
-        mint val = sg.prod(0,now+1).value;
-        mint UNIT = mint(mint(2)*val)/((v+1)*v);
-        sg.apply(now+1,now+2, mint(UNIT*v));
-        sg.apply(now+2,now+v.x+2,mint(-1)*UNIT);
+        x--;
+        auto [v,t,f] = V[x];
 
+        if (g[x].size() < sqrt(n)){
+            int lt = t, lind = x;
+            for(auto e:g[x]){
+                if (g[e].size() < sqrt(n)) continue;
+                auto [ev,et,ef] = V[e];
+                if (!ef || et < lt) continue;
+                lt = et;
+                lind = e;
+            }
+            v = get<0>(V[lind]);
+
+            for(auto e:g[x]){
+                if (g[e].size() < sqrt(n)){
+                    V[e] = {v,i+1,0};
+                }
+                else{
+                    auto [ev,et,ef] = V[e];
+                    if (!ef) continue;
+                    lt = et;
+                    lind = e;
+                }
+            }
+        }
+        else{
+            V[x] = {v,i+1,1};
+        }
     }
+}   
 
-    mint ans = 0;
-    for(int i = n+1; i <= 400100 ; i++){
-        ans += mint(i)*sg.prod(0,i+1).value;
-    }
-    cout << ans << endl;
-
-
-}
 
 
 

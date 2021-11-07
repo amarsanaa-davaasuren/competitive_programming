@@ -39,7 +39,7 @@
 using namespace std;
 using ll = long long;
 using LL = long long;
-using comp = complex<double>;
+using comp = complex<long double>;
 
 typedef std::pair<int, int> pii;
 typedef std::pair<int, double> pid;
@@ -58,13 +58,7 @@ comp inC(){
     return {x,y};
 }
 
-struct Data {
-    ll cost,val;
-    Data(ll cost=0, ll val=0) : cost(cost), val(val){}
-    bool operator<(const Data& a) const {
-        return cost > a.cost;
-    }
-};
+
 
 void tle(){
     rep(i,2002002002002) continue;
@@ -117,14 +111,48 @@ struct combination {
 } comb(202);
 
 
+#ifndef ATCODER_LAZYSEGTREE_HPP
+#define ATCODER_LAZYSEGTREE_HPP 1
+
+// #include "atcoder/internal_bit"
+#ifndef ATCODER_INTERNAL_BITOP_HPP
+#define ATCODER_INTERNAL_BITOP_HPP 1
+
+#ifdef _MSC_VER
+#include <intrin.h>
+#endif
+
+namespace atcoder {
+
 namespace internal {
+
+// @param n `0 <= n`
+// @return minimum non-negative `x` s.t. `n <= 2**x`
 int ceil_pow2(int n) {
     int x = 0;
     while ((1U << x) < (unsigned int)(n)) x++;
     return x;
 }
+
+// @param n `1 <= n`
+// @return minimum non-negative `x` s.t. `(n & (1 << x)) != 0`
+int bsf(unsigned int n) {
+#ifdef _MSC_VER
+    unsigned long index;
+    _BitScanForward(&index, n);
+    return index;
+#else
+    return __builtin_ctz(n);
+#endif
 }
 
+}  // namespace internal
+
+}  // namespace atcoder
+
+#endif  // ATCODER_INTERNAL_BITOP_HPP
+
+namespace atcoder {
 
 template <class S,
           S (*op)(S, S),
@@ -156,14 +184,14 @@ struct lazy_segtree {
         for (int i = 1; i <= log; i++) update(p >> i);
     }
 
-    S get(int p) const {
+    S get(int p) {
         assert(0 <= p && p < _n);
         p += size;
         for (int i = log; i >= 1; i--) push(p >> i);
         return d[p];
     }
 
-    S prod(int l, int r) const {
+    S prod(int l, int r) {
         assert(0 <= l && l <= r && r <= _n);
         if (l == r) return e();
 
@@ -172,7 +200,7 @@ struct lazy_segtree {
 
         for (int i = log; i >= 1; i--) {
             if (((l >> i) << i) != l) push(l >> i);
-            if (((r >> i) << i) != r) push((r - 1) >> i);
+            if (((r >> i) << i) != r) push(r >> i);
         }
 
         S sml = e(), smr = e();
@@ -186,7 +214,7 @@ struct lazy_segtree {
         return op(sml, smr);
     }
 
-    S all_prod() const { return d[1]; }
+    S all_prod() { return d[1]; }
 
     void apply(int p, F f) {
         assert(0 <= p && p < _n);
@@ -225,10 +253,10 @@ struct lazy_segtree {
         }
     }
 
-    template <bool (*g)(S)> int max_right(int l) const {
+    template <bool (*g)(S)> int max_right(int l) {
         return max_right(l, [](S x) { return g(x); });
     }
-    template <class G> int max_right(int l, G g) const {
+    template <class G> int max_right(int l, G g) {
         assert(0 <= l && l <= _n);
         assert(g(e()));
         if (l == _n) return _n;
@@ -254,10 +282,10 @@ struct lazy_segtree {
         return _n;
     }
 
-    template <bool (*g)(S)> int min_left(int r) const {
+    template <bool (*g)(S)> int min_left(int r) {
         return min_left(r, [](S x) { return g(x); });
     }
-    template <class G> int min_left(int r, G g) const {
+    template <class G> int min_left(int r, G g) {
         assert(0 <= r && r <= _n);
         assert(g(e()));
         if (r == 0) return 0;
@@ -285,82 +313,120 @@ struct lazy_segtree {
 
   private:
     int _n, size, log;
-    mutable std::vector<S> d;
-    mutable std::vector<F> lz;
+    std::vector<S> d;
+    std::vector<F> lz;
 
     void update(int k) { d[k] = op(d[2 * k], d[2 * k + 1]); }
-    void all_apply(int k, F f) const {
+    void all_apply(int k, F f) {
         d[k] = mapping(f, d[k]);
-        if (k < size) lz[k] = composition(f, lz[k]);
+        if (k < size) {
+            lz[k] = composition(f, lz[k]);
+            if (d[k].fail) push(k), update(k);  // MODIFIED!!!
+        }
     }
-    void push(int k) const {
+    void push(int k) {
         all_apply(2 * k, lz[k]);
         all_apply(2 * k + 1, lz[k]);
         lz[k] = id();
     }
 };
 
+}  // namespace atcoder
 
+#endif  // ATCODER_LAZYSEGTREE_HPP
 
-struct S { ll value,size;}; // セグ木要素
- 
-using F = ll; // 区間関数
- 
-S op(S sl, S sr) { // セグ木・結合
-  return {min(sl.value,sr.value),sl.size+sr.size};
+/////////////////////////////////////////////////////// ACL ここまで ///////////////////////////////////////////////////////
+
+namespace SegtreeBeats {
+
+constexpr int BINF = 1 << 30;
+struct S {
+    int max;    // 区間最大値
+    int lcm;    // min(BINF, (区間内全要素の最大公約数))
+    int sz;     // 区間要素数
+    uint64_t sum;    // 区間内全要素の総和
+    bool fail;
+    S() : max(0), lcm(1), sz(0), sum(0), fail(0) {}
+    S(int x, int sz_ = 1) : max(x), lcm(x), sz(sz_), sum((uint64_t)x * sz_), fail(0) {}
+};
+
+S e() { return S(); }
+
+S op(S l, S r) {
+    if (r.sz == 0) return l;
+    if (l.sz == 0) return r;
+    S ret;
+    ret.max = std::max(l.max, r.max);
+    ret.sum = l.sum + r.sum;
+    ret.lcm = std::min(uint64_t(BINF), (uint64_t)l.lcm * r.lcm / std::gcd(l.lcm, r.lcm));
+    ret.sz = l.sz + r.sz;
+    return ret;
 }
 
-S e() { return {0,1}; } // unitary element
- 
-S mapping(F f, S s){ // 区間関数
-  return {s.value+f,s.size};
+struct F {
+    int dogcd, reset;
+    F() : dogcd(0), reset(0) {}
+    F(int g, int upd) : dogcd(g), reset(upd) {}
+    static F gcd(int g) noexcept { return F(g, 0); }
+    static F update(int a) noexcept { return F(0, a); }
+};
+
+F composition(F fnew, F fold) {
+    if (fnew.reset) return F::update(fnew.reset);
+    else if (fold.reset) {
+        return F::update(std::gcd(fnew.dogcd, fold.reset));
+    } else {
+        return F::gcd(std::gcd(fnew.dogcd, fold.dogcd));
+    }
 }
- 
-F composition(F f, F g){// 区間関数の結合
-     return f+g; 
-}
- 
-F id() { // id を返す関数 F id()
-    return 0; 
-}
- 
 
+F id() { return F(); }
 
-void solve(){
-    
-
-    lazy_segtree<S, op, e, F, mapping, composition, id> sg(400200);
-
-    int n;
-    cin >> n;
-
-
-
-    rep(i,n){
-        int x,v;
-        cin >> x >> v;
-        
-        
-        
-        
-        sg.apply(x,x+1, v);
-        sg.apply(x+1,x+1+v,-1);
-        rep(j,20){
-            ll a = sg.get(j+1).value;
-            cout << a << " ";
+S mapping(F f, S x) {
+    if (x.fail) return x;
+    if (f.reset) x = S(f.reset, x.sz);
+    if (f.dogcd) {
+        if (x.sz == 1) {
+            x = S(std::gcd(x.max, f.dogcd));
+        } else if (x.lcm == BINF || f.dogcd % x.lcm) {
+            // 区間 gcd クエリによって，複数個の要素からなる区間である値が変更を受ける場合のみ計算失敗
+            x.fail = true;
         }
-        cout << endl;
-        rep(j,20){
-            ll a = sg.prod(0,j+1+1).value;
-            cout << a << " ";
-        }
-        cout << endl;
+    }
+    return x;
+}
+using segtree = atcoder::lazy_segtree<S, op, e, F, mapping, composition, id>;
+} // namespace SegtreeBeats
+
+
+
+
+void solve() {
+    cin.tie(nullptr), ios::sync_with_stdio(false);
+    int N, Q;
+    cin >> N >> Q;
+    vector<SegtreeBeats::S> A(N);
+    for (auto &a : A) {
+        int tmp;
+        cin >> tmp, a = tmp;
     }
 
-
-
+    SegtreeBeats::segtree segtree(A);
+    int q, l, r, x;
+    while (Q--) {
+        cin >> q >> l >> r;
+        l--;
+        if (q <= 2) {
+            cin >> x;
+            if (q == 1) segtree.apply(l, r, SegtreeBeats::F::update(x));
+            if (q == 2) segtree.apply(l, r, SegtreeBeats::F::gcd(x));
+        } else {
+            auto v = segtree.prod(l, r);
+            if (q == 3) cout << v.max << '\n';
+            if (q == 4) cout << v.sum << '\n';
+        }
+    }
 }
-
 
 
 
@@ -371,6 +437,7 @@ int main() {
         solve();
     }
 }
+
 
 
 
