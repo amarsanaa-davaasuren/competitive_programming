@@ -110,70 +110,94 @@ struct combination {
   }
 } comb(202);
 
+struct Node {
+    int val;
+    Node *next;
+    Node *prev;
+    Node(int x) : val(x), next(NULL), prev(NULL) {}
+};
 
-vector<int> g[200200];
-tuple<int,int,int> V[200200];
 
-void solve(){
-    cin.tie(nullptr), ios::sync_with_stdio(false);
-    int n,m,q;
-    cin >> n >> m >> q;
+struct Sieve{
+    int NMAX;
+    vector<vector<pair<int,int>>> fac;
+    vector<int> f, primes;
+
+    Sieve(int NMAX=1):NMAX(NMAX), f(NMAX+1) {
+        f[0] = f[1] = -1;
+        for (ll i = 2; i <= NMAX; ++i) {
+            if (f[i]) continue;
+            primes.push_back(i);
+            f[i] = i;
+            for (ll j = i*i; j <= NMAX; j += i) {
+                if (!f[j]) f[j] = i;
+            }
+        }
+    }
     
-    rep(i,m){
-        int u,v;
-        cin >> u >> v;
-        u--;v--;
-        g[u].pb(v);
-        g[v].pb(u);
-    }
-    rep(i,n) V[i] = {i+1,0,0}; // value, last time updated, need to propagated
-
-    rep(i,q){
-        int x;
-        cin >> x;
-        x--;
-        auto [v,t,f] = V[x];
-
-        if (g[x].size() < sqrt(n)){
-            int lt = t, lind = x;
-            for(auto e:g[x]){
-                if (g[e].size() < sqrt(n)) continue;
-                auto [ev,et,ef] = V[e];
-                if (!ef || et < lt) continue;
-                lt = et;
-                lind = e;
+    void factorize(){
+        fac.resize(NMAX);
+        int p = 2;
+        while(p<NMAX){
+            int cur = p;
+            fac[cur].pb({p,1});
+            while(cur+p < NMAX){
+                cur += p;
+                int power = 0;
+                int tmp = cur;
+                while(tmp%p==0){
+                    power++;
+                    tmp /= p;
+                }
+                fac[cur].pb({p,power});
             }
-            v = get<0>(V[lind]);
-
-            for(auto e:g[x]){
-                if (g[e].size() < sqrt(n)){
-                    V[e] = {v,i+1,0};
-                }
-                else{
-                    auto [ev,et,ef] = V[e];
-                    if (!ef) continue;
-                    lt = et;
-                    lind = e;
-                }
+            while(p < NMAX && fac[p].size() != 0){
+                p++;
             }
         }
-        else{
-            V[x] = {v,i+1,1};
+    }
+};
+
+
+
+ll g(ll x, ll p){
+    if (x<p) return 0;
+    return x/p + g(x/p,p);
+}
+void solve() {
+    ll k,n;
+    cin >> n >> k;
+    int N = 1e6;
+    Sieve sv(N);
+
+    vector<ll> x(k);
+    ll l = n-k+1;
+    rep(i,k) x[i] = l+i;
+    mint ans = 1;
+    for(auto p:sv.primes){
+        ll now = g(n,p)-g(n-k,p)-g(k,p);
+        ans *= (now+1);
+        for(ll i = (l/p)*p;i<=n;i+=p){
+            if (i<l) continue;
+            while(x[i-l]%p==0){
+                x[i-l]/=p;
+            }
         }
     }
-}   
 
+    for(auto e:x) if (e!=1) ans*=2;
 
-
-
-
-int main() {
-    int T = 1;
-    // cin >> T;
-    while (T--) {
-        solve();
-    }
+    cout << ans;
 }
 
-
+int main(){
+    cin.tie(nullptr), ios::sync_with_stdio(false);
+    int T = 1;
+    // cin >> T;
+    for(int t = 1; t <=T ; t++){
+        // cout << "Case #" << t << ": ";
+        solve();
+        // cout << endl;
+    }
+}
 
