@@ -45,6 +45,7 @@ const int mod =  998244353;
 class UnionFind{
 public:
     int uf[200005];
+
     UnionFind(){
         memset(uf,-1,sizeof uf);
     }
@@ -57,7 +58,9 @@ public:
     void join(int i, int j){
         int pi = parent(i);
         int pj = parent(j);
-        if (pi == pj) return;
+        if (pi == pj){
+            return;
+        }
         if (size(pi) < size(pj)) swap(pi,pj);
         uf[pi] += uf[pj];
         uf[pj] = pi;

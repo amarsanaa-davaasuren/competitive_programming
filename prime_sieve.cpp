@@ -48,7 +48,6 @@ typedef std::vector<pii> vii;
 
 const double PI = 3.14159265358979323846264338327950L;
 const int mod = 1e9+7;
-const int NMAX = 1001000;
 
 
 bool is_prime(ll n){
@@ -60,38 +59,64 @@ bool is_prime(ll n){
     return true;
 }
 
+struct Sieve{
+    int NMAX;
+    vector<vector<pair<int,int>>> fac;
+    vector<int> f, primes;
+
+    Sieve(int NMAX=1):NMAX(NMAX), f(NMAX+1) {
+        f[0] = f[1] = -1;
+        for (ll i = 2; i <= NMAX; ++i) {
+            if (f[i]) continue;
+            primes.push_back(i);
+            f[i] = i;
+            for (ll j = i*i; j <= NMAX; j += i) {
+                if (!f[j]) f[j] = i;
+            }
+        }
+    }
+    
+    void factorize(){
+        fac.resize(NMAX);
+        int p = 2;
+        while(p<NMAX){
+            int cur = p;
+            fac[cur].pb({p,1});
+            while(cur+p < NMAX){
+                cur += p;
+                int power = 0;
+                int tmp = cur;
+                while(tmp%p==0){
+                    power++;
+                    tmp /= p;
+                }
+                fac[cur].pb({p,power});
+            }
+            while(p < NMAX && fac[p].size() != 0){
+                p++;
+            }
+        }
+    }
+};
+
 
 
 void solve(){
+    Sieve sieve(100101);
+    cout << sieve.primes.size() << endl;
+    // for(auto e:sieve.primes) cout << e << " ";
+    // cout << endl;
 
-    vector<vector<pair<int,int>>> cnt(NMAX,vector<pair<int,int>>());
-    int p = 2;
-    
-    while(p<NMAX){
-        int cur = p;
-        cnt[cur].pb({p,1});
-        while(cur+p < NMAX){
-            cur += p;
-            int power = 0;
-            int tmp = cur;
-            while(tmp%p==0){
-                power++;
-                tmp /= p;
-            }
-            cnt[cur].pb({p,power});
-        }
-        while(p < NMAX && cnt[p].size() != 0){
-            p++;
-        }
-    }
-    
-    
-    rep(i,101){
-        cout << i << endl;
-        for(auto e:cnt[i]) cout << e.first << "~" << e.second << " ";
-        cout << endl;
-    }
+    // sieve.factorize();
+    // rep(i,100){
+    //     cout << i << "=";
+    //     for(auto e: sieve.fac[i]){
+    //         cout << e.first << "^" << e.second <<" ";
+    //     }
+    //     cout << endl;
+    // }
 }
+
 
 int main() {
     int T = 1;

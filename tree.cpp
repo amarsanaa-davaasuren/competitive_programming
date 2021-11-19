@@ -120,18 +120,27 @@ struct combination {
 
 
 
+
 struct TREE{
 public:
     int N;
-    int bottom_node[200200];
-    int parent_node[200200][22];
-    int depths[200200];
-    int deepest_depths[200200];
-    int floor_cnts[200200];
-    vector<int> graph[200200];
+    int PN = 22;
+    vector<int> bottom_node;
+    vector<vector<int>> parent_node;
+    vector<int> depths;
+    vector<int> deepest_depths;
+    vector<int> floor_cnts;
+    vector<vector<int>> graph;
     vector<int> path_to_floor;
     
-    TREE(int N) : N(N){}
+    TREE(int N) : N(N){
+        bottom_node = vector<int> (N,-1);
+        parent_node = vector<vector<int>> (N,vector<int>(PN,-1));
+        depths = vector<int> (N,-1);
+        deepest_depths = vector<int> (N,-1);
+        floor_cnts = vector<int> (N,-1);
+        graph = vector<vector<int>> (N,vector<int>());
+    }
 
     void read_graph(){
         rep(i,N) graph[i].clear();
@@ -154,12 +163,12 @@ public:
     
     tuple<int> get_depths(int node, int parent = -1, int depth = 0, int start_flag = 1){
         if (start_flag){
-            memset(depths,-1,sizeof depths);
-            memset(deepest_depths,-1,sizeof deepest_depths);
-            memset(bottom_node,-1,sizeof bottom_node);
-            memset(floor_cnts,-1,sizeof floor_cnts);
-            memset(parent_node,-1,sizeof parent_node);
-            rep(i,N)rep(j,22) parent_node[i][j] = node;
+            bottom_node = vector<int> (N,-1);
+            parent_node = vector<vector<int>> (N,vector<int>(PN,-1));
+            depths = vector<int> (N,-1);
+            deepest_depths = vector<int> (N,-1);
+            floor_cnts = vector<int> (N,-1);
+            rep(i,N)rep(j,PN) parent_node[i][j] = node;
             path_to_floor.clear();
         }
         int cnt = 0;
@@ -188,7 +197,7 @@ public:
 
         if (start_flag){
             get_path_to_floor(node);
-            rep(i,21) rep(j,N) 
+            rep(i,PN-1) rep(j,N) 
                 parent_node[j][i+1]=parent_node[parent_node[j][i]][i];
         }
         
@@ -197,13 +206,13 @@ public:
 
     int lca(int a,int b){
         if(depths[a]<depths[b]) swap(a,b); // aが深い
-        rep(i,22){
+        rep(i,PN){
             if ((depths[a]-depths[b])&(1<<i)){
                 a=parent_node[a][i];
             }
         }
         if(a==b) return a;
-        for(int i=21;i>=0;i--){
+        for(int i=PN-1;i>=0;i--){
             if(parent_node[a][i]!=parent_node[b][i]){
                 a=parent_node[a][i];
                 b=parent_node[b][i];
@@ -219,7 +228,6 @@ public:
         return diameter;
     }
 };
-
 
 
 
