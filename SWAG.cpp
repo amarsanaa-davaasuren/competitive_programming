@@ -156,69 +156,17 @@ struct maxQueue {
 
 
 void solve(){
+    maxQueue q;
+    rep(i,10) q.push(i);
     
-    int h,w,h1,w1,h2,w2;
-    cin >> h >> w >> h1 >> w1 >> h2 >>  w2;
-    h2 = min(h2,h1);
-    w2 = min(w2,w1);
-    vector a(h+1,vector<ll>(w+1,0));
-    rep(i,h) rep(j,w) cin >> a[i+1][j+1];
-
-    rep(i,h+1) rep(j,w) a[i][j+1] += a[i][j];
-    rep(i,h) rep(j,w+1) a[i+1][j] += a[i][j];
-
-    auto sum = [&](int i, int j, int h, int w){
-        ll ret = a[i+h][j+w];
-        ret -= a[i][j+w];
-        ret -= a[i+h][j];
-        ret += a[i][j];
-        return ret;
-    };
     
 
-    
-    vector a2(h-h2+1,vector<ll>(w-w2+1));
-    rep(i,h-h2+1){
-        rep(j,w-w2+1){
-            ll v = sum(i,j,h2,w2);
-            a2[i][j] = v; 
-        }
-    }
-
-    vector a3(h-h2+1,vector<ll>(w-w1+1));
-    rep(i,h-h2+1) {
-        maxQueue q;
-        rep(j,w1-w2+1) q.push(a2[i][j]);
-        rep(j,w-w1+1) {
-            if (j) {
-                q.push(a2[i][w1-w2+j]);
-                q.pop();
-            }
-            a3[i][j] = q.getMax();
-        }
-    }
-
-    vector a4(h-h1+1,vector<ll>(w-w1+1));
-    rep(j,w-w1+1) {
-        maxQueue q;
-        rep(i,h1-h2+1) q.push(a3[i][j]);
-        rep(i,h-h1+1) {
-            if (i) {
-                q.push(a3[h1-h2+i][j]);
-                q.pop();
-            }
-            a4[i][j] = q.getMax();
-        }
-    }
-
-    ll ans = 0;
-    rep(i,h-h1+1)rep(j,w-w1+1) {
-        ll now = sum(i,j,h1,w1);
-        now -= a4[i][j];
-        chmax(ans,now);
-    }
-    cout << ans;
-
+    cout << q.s.size() << " ";
+    cout << q.t.size() << " ";
+    cout << endl;
+    q.pop();
+    cout << q.s.size() << " ";
+    cout << q.t.size() << " ";
 }
 
 int main(){
