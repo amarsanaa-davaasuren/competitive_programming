@@ -63,8 +63,7 @@ public:
         }
         if (size(pi) < size(pj)) swap(pi,pj);
         uf[pi] += uf[pj];
-        uf[pj] = pi;
-        
+        uf[pj] = pi;   
     }
     
     int size(int i){

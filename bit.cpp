@@ -166,7 +166,7 @@ template <class T> struct fenwick_tree {
 
 int main()
 {
-    fenwick_tree<ll> fw(1000);
+    fenwick_tree<ll> fw(200200);
 	fw.add(0,10);
 	cout << fw.sum(0,1);
 
