@@ -127,14 +127,25 @@ struct Edge{
 
 struct maxStack {
     stack<ll> a, mx;
-    ll getMax() { return mx.size() ? mx.top() : 0;}
+    ll getMax() { 
+        if (mx.size() != 0) return mx.top();
+        return 0;
+    }
     void push(ll x) {
         a.push(x);
         mx.push(max(x, getMax()));
     }
-    ll top() { assert(a.size()); return a.top();}
-    void pop() { a.pop(); mx.pop();}
-    int size() { return a.size();}
+    ll top() { 
+        assert(a.size());
+        return a.top();
+    }
+    void pop() { 
+        a.pop(); 
+        mx.pop();
+    }
+    int size() {
+        return a.size();
+    }
 };
 struct maxQueue {
     maxStack s, t;
@@ -144,9 +155,12 @@ struct maxQueue {
             t.pop();
         }
     }
-    void push(ll x) { t.push(x);}
+    void push(ll x) { 
+        t.push(x);
+    }
+
     void pop() {
-    if (!s.size()) mv();
+        if (!s.size()) mv();
         s.pop();
     }
     ll getMax() {
@@ -159,8 +173,6 @@ void solve(){
     maxQueue q;
     rep(i,10) q.push(i);
     
-    
-
     cout << q.s.size() << " ";
     cout << q.t.size() << " ";
     cout << endl;

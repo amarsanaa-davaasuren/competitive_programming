@@ -40,6 +40,7 @@
 
 using namespace std;
 using ll = long long;
+using ull = unsigned long long;
 using LL = long long;
 using comp = complex<long double>;
 
@@ -110,7 +111,7 @@ mint operator()(int n, int k) {
     if (k < 0 || k > n) return 0;
     return fact[n]*ifact[k]*ifact[n-k];
 }
-} comb(2002);
+} comb(100100);
 
 struct Node {
     int val;
@@ -125,99 +126,112 @@ struct Edge{
     Edge(int to, int id):to(to),id(id){}
 };
 
-struct maxStack {
-    stack<ll> a, mx;
-    ll getMax() { return mx.size() ? mx.top() : 0;}
-    void push(ll x) {
-        a.push(x);
-        mx.push(max(x, getMax()));
+
+
+template<typename U = int, int B = 31>
+class binary_trie {
+    struct node {
+        int cnt;
+        node *ch[2];
+        node() : cnt(0), ch{ nullptr, nullptr } {}
+    };
+    node* add(node* t, U val, int b = B - 1) {
+        if (!t) t = new node;
+        t->cnt += 1;
+        if (b < 0) return t;
+        bool f = (val >> (U)b) & (U)1;
+        t->ch[f] = add(t->ch[f], val, b - 1);
+        return t;
     }
-    ll top() { assert(a.size()); return a.top();}
-    void pop() { a.pop(); mx.pop();}
-    int size() { return a.size();}
-};
-struct maxQueue {
-    maxStack s, t;
-    void mv() {
-        while (t.size()) {
-            s.push(t.top());
-            t.pop();
+    node* sub(node* t, U val, int b = B - 1) {
+        assert(t);
+        t->cnt -= 1;
+        if (t->cnt == 0) return nullptr;
+        if (b < 0) return t;
+        bool f = (val >> (U)b) & (U)1;
+        t->ch[f] = sub(t->ch[f], val, b - 1);
+        return t;
+    }
+
+    U get_min(node* t, U val, int b = B - 1) const {
+        assert(t);
+        if (b < 0) return 0;
+        bool f = (val >> (U)b) & (U)1;
+        bool next;
+        if (t->ch[1^f]) next = (1^f);
+        else next = f;
+        f = (next^f);
+        return get_min(t->ch[next], val, b - 1) | ((U)f << (U)b);
+    }
+
+    U get_max(node* t, U val, int b = B - 1) const {
+        assert(t);
+        if (b < 0) return 0;
+        bool f = (val >> (U)b) & (U)1; 
+        bool next;
+        if (t->ch[1^f]) next = 1^f;
+        else next = f;
+        f = (next^f);
+        return get_max(t->ch[next], val, b - 1) | ((U)f << (U)b);
+    }
+
+    U get(node* t, int k, int b = B - 1) const {
+        if (b < 0) return 0;
+        int m = t->ch[0] ? t->ch[0]->cnt : 0;
+        return k < m ? get(t->ch[0], k, b - 1) : get(t->ch[1], k - m, b - 1) | ((U)1 << (U)b);
+    }
+    int count_lower(node* t, U val, int b = B - 1) {
+        if (!t || b < 0) return 0;
+        bool f = (val >> (U)b) & (U)1;
+        return (f && t->ch[0] ? t->ch[0]->cnt : 0) + count_lower(t->ch[f], val, b - 1);
+    }
+    node *root;
+public:
+    binary_trie() : root(nullptr) {}
+    int size() const {
+        return root ? root->cnt : 0;
+    }
+    bool empty() const {
+        return !root;
+    }
+    void insert(U val) {
+        root = add(root, val);
+    }
+    void erase(U val) {
+        root = sub(root, val);
+    }
+    U max_XOR_element(U bias = 0) const {
+        return get_max(root, bias);
+    }
+    U min_XOR_element(U bias = 0) const {
+        return get_min(root, bias);
+    }
+    int lower_bound(U val) { // return id
+        return count_lower(root, val);
+    }
+    int upper_bound(U val) { // return id
+        return count_lower(root, val + 1);
+    }
+    U operator[](int k) const {
+        assert(0 <= k && k < size());
+        return get(root, k);
+    }
+    int count(U val) const {
+        if (!root) return 0;
+        node *t = root;
+        for (int i = B - 1; i >= 0; i--) {
+            t = t->ch[(val >> (U)i) & (U)1];
+            if (!t) return 0;
         }
-    }
-    void push(ll x) { t.push(x);}
-    void pop() {
-    if (!s.size()) mv();
-        s.pop();
-    }
-    ll getMax() {
-        return max(s.getMax(), t.getMax());
+        return t->cnt;
     }
 };
 
 
 void solve(){
-    
-    int h,w,h1,w1,h2,w2;
-    cin >> h >> w >> h1 >> w1 >> h2 >>  w2;
-    h2 = min(h2,h1);
-    w2 = min(w2,w1);
-    vector a(h+1,vector<ll>(w+1,0));
-    rep(i,h) rep(j,w) cin >> a[i+1][j+1];
 
-    rep(i,h+1) rep(j,w) a[i][j+1] += a[i][j];
-    rep(i,h) rep(j,w+1) a[i+1][j] += a[i][j];
 
-    auto sum = [&](int i, int j, int h, int w){
-        ll ret = a[i+h][j+w];
-        ret -= a[i][j+w];
-        ret -= a[i+h][j];
-        ret += a[i][j];
-        return ret;
-    };
-    
 
-    
-    vector a2(h-h2+1,vector<ll>(w-w2+1));
-    rep(i,h-h2+1){
-        rep(j,w-w2+1){
-            ll v = sum(i,j,h2,w2);
-            a2[i][j] = v; 
-        }
-    }
-
-    vector a3(h-h2+1,vector<ll>(w-w1+1));
-    rep(i,h-h2+1) {
-        maxQueue q;
-        rep(j,w1-w2+1) q.push(a2[i][j]);
-        rep(j,w-w1+1) {
-            if (j) {
-                q.push(a2[i][w1-w2+j]);
-                q.pop();
-            }
-            a3[i][j] = q.getMax();
-        }
-    }
-
-    vector a4(h-h1+1,vector<ll>(w-w1+1));
-    rep(j,w-w1+1) {
-        maxQueue q;
-        rep(i,h1-h2+1) q.push(a3[i][j]);
-        rep(i,h-h1+1) {
-            if (i) {
-                q.push(a3[h1-h2+i][j]);
-                q.pop();
-            }
-            a4[i][j] = q.getMax();
-        }
-    }
-
-    ll ans = 0;
-    rep(i,h-h1+1)rep(j,w-w1+1) {
-        ll now = sum(i,j,h1,w1);
-        now -= a4[i][j];
-        chmax(ans,now);
-    }
-    cout << ans;
 
 }
 
