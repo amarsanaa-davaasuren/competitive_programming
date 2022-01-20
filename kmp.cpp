@@ -95,16 +95,10 @@ void KMPSearch(char* pat, char* txt)
         }
     }
 }
-  
-// Fills lps[] for given patttern pat[0..M-1]
-void computeLPSArray(char* pat, int M, vector<int>& lps)
-{
-    // length of the previous longest prefix suffix
+
+void computeLPSArray(char* pat, int M, vector<int>& lps){
     int len = 0;
-  
-    lps[0] = 0; // lps[0] is always 0
-  
-    // the loop calculates lps[i] for i = 1 to M-1
+    lps[0] = len;
     int i = 1;
     while (i < M) {
         if (pat[i] == pat[len]) {
@@ -112,31 +106,25 @@ void computeLPSArray(char* pat, int M, vector<int>& lps)
             lps[i] = len;
             i++;
         }
-        else // (pat[i] != pat[len])
-        {
-            // This is tricky. Consider the example.
-            // AAACAAAA and i = 7. The idea is similar
-            // to search step.
+        else{
             if (len != 0) {
                 len = lps[len - 1];
-  
-                // Also, note that we do not increment
-                // i here
             }
-            else // if (len == 0)
-            {
+            else{
                 lps[i] = 0;
                 i++;
             }
         }
     }
+    for(auto e:lps) cout << e << " ";
+    cout << endl;
 }
   
 // Driver program to test above function
 int main()
 {
     char txt[] = "ABABDABACDABABCABABCCCCAAAAABABABABABABA";
-    char pat[] = "ABA";
+    char pat[] = "ABACADADGGGGAABACDA";
     KMPSearch(pat, txt);
     return 0;
 }

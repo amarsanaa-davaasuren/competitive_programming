@@ -126,45 +126,45 @@ struct Edge{
 };
 
 struct maxStack {
-    stack<ll> a, mx;
+    stack<ll> nums, maxs;
     ll getMax() { 
-        if (mx.size() != 0) return mx.top();
+        if (maxs.size() != 0) return maxs.top();
         return 0;
     }
-    void push(ll x) {
-        a.push(x);
-        mx.push(max(x, getMax()));
+    void push(ll num){
+        nums.push(num);
+        maxs.push(max(num, getMax()));
     }
     ll top() { 
-        assert(a.size());
-        return a.top();
+        assert(nums.size());
+        return nums.top();
     }
     void pop() { 
-        a.pop(); 
-        mx.pop();
+        nums.pop(); 
+        maxs.pop();
     }
     int size() {
-        return a.size();
+        return nums.size();
     }
 };
 struct maxQueue {
-    maxStack s, t;
+    maxStack left, right;
     void mv() {
-        while (t.size()) {
-            s.push(t.top());
-            t.pop();
+        while (right.size()) {
+            left.push(right.top());
+            right.pop();
         }
     }
-    void push(ll x) { 
-        t.push(x);
+    void push(ll num) { 
+        right.push(num);
     }
 
     void pop() {
-        if (!s.size()) mv();
-        s.pop();
+        if (!left.size()) mv();
+        left.pop();
     }
     ll getMax() {
-        return max(s.getMax(), t.getMax());
+        return max(left.getMax(), right.getMax());
     }
 };
 
@@ -173,12 +173,12 @@ void solve(){
     maxQueue q;
     rep(i,10) q.push(i);
     
-    cout << q.s.size() << " ";
-    cout << q.t.size() << " ";
+    cout << q.left.size() << " ";
+    cout << q.right.size() << " ";
     cout << endl;
     q.pop();
-    cout << q.s.size() << " ";
-    cout << q.t.size() << " ";
+    cout << q.left.size() << " ";
+    cout << q.right.size() << " ";
 }
 
 int main(){
