@@ -23,6 +23,8 @@
 // #include <bits/stdc++.h>
 #include <complex>
 
+#include <chrono>
+
 #define maxs(x,y) x = max(x,y)
 #define mins(x,y) x = min(x,y)
 #define rep(i,n) for(int i=0;(i)<(n);(i)++)
@@ -40,6 +42,8 @@
 #define chmax(x,y) x = max(x, y)
 
 using namespace std;
+using namespace std::chrono;
+
 using ll = long long;
 using ull = unsigned long long;
 using LL = long long;
@@ -130,16 +134,6 @@ struct Edge{
 
 void solve(){
     
-    
-    list<int> lst;
-    lst.pop_back();
-    list<int>::iterator it = lst.begin();
-    reverse(begin(lst),end(lst));
-
-    cout << *it;
-    
-    
-
 }
 
 int main(){
