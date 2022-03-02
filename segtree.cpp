@@ -47,47 +47,16 @@ typedef std::vector<pii> vii;
 #define PI 3.14159265358979323846264338327950L
 const int mod = 998244353;
 
-struct mint {
-    ll x; // typedef long long ll;
-    mint(ll x=0):x((x%mod+mod)%mod){}
-    mint operator-() const { return mint(-x);}
-    mint& operator+=(const mint a) {
-    if ((x += a.x) >= mod) x -= mod;
-        return *this;
-    }
-    mint& operator-=(const mint a) {
-    if ((x += mod-a.x) >= mod) x -= mod;
-        return *this;
-    }
-    mint& operator*=(const mint a) { (x *= a.x) %= mod; return *this;}
-    mint operator+(const mint a) const { return mint(*this) += a;}
-    mint operator-(const mint a) const { return mint(*this) -= a;}
-    mint operator*(const mint a) const { return mint(*this) *= a;}
-    mint pow(ll t) const {
-    if (!t) return 1;
-    mint a = pow(t>>1);
-    a *= a;
-    if (t&1) a *= *this;
-        return a;
-    }
 
-    // for prime mod
-    mint inv() const { return pow(mod-2);}
-    mint& operator/=(const mint a) { return *this *= a.inv();}
-    mint operator/(const mint a) const { return mint(*this) /= a;}
-};
-istream& operator>>(istream& is, mint& a) { return is >> a.x;}
-ostream& operator<<(ostream& os, const mint& a) { return os << a.x;}
-
-
-
+// -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
 
 namespace internal {
-int ceil_pow2(int n) {
-    int x = 0;
-    while ((1U << x) < (unsigned int)(n)) x++;
-    return x;
-}
+    int ceil_pow2(int n) {
+        int x = 0;
+        while ((1U << x) < (unsigned int)(n)) x++;
+        return x;
+    }
 }
 
 //segtree<SGT, op, e> seg(100100);
@@ -198,22 +167,77 @@ template <class S, S (*op)(S, S), S (*e)()> struct segtree {
 
 struct SGT{
     ll val;
-    SGT(ll val = 1):val(val){}
+    SGT(ll val):val(val){}
 };
-SGT op(SGT a, SGT b) {
+const int SID = 1e9;
+SGT e() {
+    return SGT(SID);
+};
+SGT opMax(SGT a, SGT b) {
+    // if a or b is an unit element return the other one
+    if (a.val == e().val) return b;
+    if (b.val == e().val) return a;
+
     if (a.val > b.val) return a;
     return b;
-}
-SGT e() {
-    return SGT(0);
+};
+
+SGT opMin(SGT a, SGT b) {
+    // if a or b is an unit element return the other one
+    if (a.val == e().val) return b;
+    if (b.val == e().val) return a;
+
+    if (a.val < b.val) return a;
+    return b;
+};
+
+SGT opXor(SGT a, SGT b) {
+    // if a or b is an unit element return the other one
+    if (a.val == e().val) return b;
+    if (b.val == e().val) return a;
+
+    return {a.val^b.val};
+};
+
+
+// -----------------------------------------------------------------------------------------------
+// -----------------------------------------------------------------------------------------------
+
+void solve(){
+    vector<int> ind = {0,1,3,54};
+    vector<int> values = {4,2,5,-190};
+    int n = ind.size();
+    {
+        cout << "segtree that finds max" << "\n";
+        segtree<SGT, opMax, e> seg(1001);
+        for(int i = 0; i < n; i++){
+            seg.set(ind[i],values[i]);
+        }
+        auto ans = seg.prod(0,100);
+        cout << ans.val << "\n";
+    }
+
+    {
+        cout << "segtree that finds min" << "\n";
+        segtree<SGT, opMin, e> seg(1001);
+        for(int i = 0; i < n; i++){
+            seg.set(ind[i],values[i]);
+        }
+        auto ans = seg.prod(0,100);
+        cout << ans.val << "\n";
+    }
+
+    {
+        cout << "segtree that finds xor" << "\n";
+        segtree<SGT, opXor, e> seg(1001);
+        for(int i = 0; i < n; i++){
+            seg.set(ind[i],values[i]);
+        }
+        auto ans = seg.prod(0,10);
+        cout << ans.val << "\n";
+    }
 }
 
-int main(){
-    segtree<SGT, op, e> seg(100100);
-    seg.set(0, {1LL<<2});
-    seg.set(1,{2});
-    seg.set(3,{5});
-    seg.set(54,{-1LL<<60});
-    auto ans = seg.prod(0,55);
-    cout << ans.val;
+int main() {
+    solve();
 }

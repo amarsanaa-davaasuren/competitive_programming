@@ -63,7 +63,9 @@
         "array": "cpp",
         "complex": "cpp",
         "numeric": "cpp",
-        "sstream": "cpp"
+        "sstream": "cpp",
+        "format": "cpp",
+        "forward_list": "cpp"
     },
     "C_Cpp.dimInactiveRegions": false,
     "debug.onTaskErrors": "abort",

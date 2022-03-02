@@ -1,1 +1,10 @@
-32
+Adding values: 1 2 3 4 -1 1 2 3 1 
+Get max/min and pop the left most value:
+   max: 4 min: -1
+   max: 4 min: -1
+   max: 4 min: -1
+   max: 4 min: -1
+   max: 3 min: -1
+   max: 3 min: 1
+Add 6 and the max/min is:
+   max: 6 min: 1
