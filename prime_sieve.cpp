@@ -99,7 +99,8 @@ struct Sieve{
     }
 };
 
-
+// Sieve of Eratosthenes
+// https://youtu.be/UTVg7wzMWQc?t=2774
 struct Sieve {
   int n;
   vector<int> f, primes;
@@ -123,7 +124,20 @@ struct Sieve {
     }
     return res;
   }
-  vector<pair<ll,int>> factorL(ll x) {
+  vector<P> factor(int x) {
+    vector<int> fl = factorList(x);
+    if (fl.size() == 0) return {};
+    vector<P> res(1, P(fl[0], 0));
+    for (int p : fl) {
+      if (res.back().first == p) {
+        res.back().second++;
+      } else {
+        res.emplace_back(p, 1);
+      }
+    }
+    return res;
+  }
+  vector<pair<ll,int>> factor(ll x) {
     vector<pair<ll,int>> res;
     for (int p : primes) {
       int y = 0;
@@ -133,9 +147,7 @@ struct Sieve {
     if (x != 1) res.emplace_back(x,1);
     return res;
   }
-} prime(33000);
-
-
+} sieve(1e6);
 
 
 void solve(){
