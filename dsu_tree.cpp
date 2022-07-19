@@ -164,13 +164,13 @@ struct D {
 
 
 
+// other example (palindrome: https://codeforces.com/contest/570/submission/164909347) 
+// https://codeforces.com/contest/600/problem/E
 vector<int> g[100100];
-vector<int> a;
 map<int,int> cnt[100100];
 map<int,ll> sum[100100];
 int sz[100100] = {};
 ll ans[100100] = {};
-
 
 
 int merge(int to, int from){
@@ -209,7 +209,6 @@ void solve(){
     rep(i,n){
         int v;
         cin >> v;
-        a.pb(v);
         cnt[i][v] = 1;
         sz[i] = 1;
         sum[i][1] += v;
